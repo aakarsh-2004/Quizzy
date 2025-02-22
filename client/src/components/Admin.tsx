@@ -7,9 +7,15 @@ const Admin = () => {
         socket.on("connect", () => {
             console.log("connection successful");
             
+            socket.emit("event", {
+                password: "1234",
+                type: "admin"
+            });
             socket.emit("joinAdmin", {
-                password: "1234"
-            })
+                password: "1234",
+                roomId: "roomId",
+                name: "aakarsh"
+            });
             
         })
 
