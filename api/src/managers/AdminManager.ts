@@ -43,6 +43,8 @@ export class AdminManager {
             }
             
             console.log("admin joined successfully");
+            console.log(data.name, data.roomId, data.password);
+            
 
             socket.emit("admin_init", {
                 adminId: adminId,
@@ -52,6 +54,8 @@ export class AdminManager {
             socket.on("createProblem", (data) => {
                 const roomId = data.roomId;
                 const problem = data.problem;
+
+                // console.log("problem created successfully by admin", problem);
 
                 this.quizManager.addProblem(roomId, problem);
             });

@@ -19,23 +19,22 @@ const userManager = UserManager.getInstance();
 const adminManager = AdminManager.getInstance();
 
 io.on('connection', (socket) => {
-    console.log("user connected successfully");
-    socket.send("connected");
+    console.log("someone connected successfully");
 
     socket.on('event', (data) => {
         console.log(data);
-        socket.emit("event", data);
+
         if(data.type=="admin") {
-            adminManager.addAdmins("roomId", data.name, socket);
+            adminManager.addAdmins(data.roomId, data.name, socket);
             console.log("adding admin");
         } else {
-            userManager.addUser("roomId", socket);
+            userManager.addUser(socket);
             console.log("adding user");
         }
     });
 
     socket.on('disconnect', () => {
-        console.log("user disconnected");
+        console.log("someone disconnected");
     });
 });
 

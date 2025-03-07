@@ -47,10 +47,23 @@ export class Quiz {
         this.activeProblem = 0;
         this.users = [];
         this.currentState = "not_started";
+
+        setInterval(() => {
+            this.debug();
+        }, 10000);
+    }
+
+    debug() {
+        console.log("============================================");
+        console.log("current state", this.currentState);
+        console.log("active problem", this.activeProblem);
+        console.log("users", this.users);
+        console.log("has started", this.hasStarted);
+        console.log("problems", this.problems);
+        console.log("============================================");
     }
 
     addProblem(problem: Problem) {
-        console.log("problems", this.problems);
         this.problems.push(problem);
     }
 
@@ -65,10 +78,12 @@ export class Quiz {
         this.hasStarted = true;
         this.setActiveProblem(this.problems[0]);
         console.log("quiz started successfully");
-        console.log("now problems are", this.problems);
     }
 
     setActiveProblem(problem: Problem) {
+        console.log("set active problem");
+
+        this.currentState = "question";
         problem.startTime = new Date().getTime();
         problem.submissions = [];
 
@@ -83,6 +98,9 @@ export class Quiz {
     }
 
     sendLeaderboard() {
+        console.log("send leaderboard");
+
+        this.currentState = "leaderboard";
         const leaderboard = this.getLeaderboard();
         IoManager.getIo().to(this.roomId).emit("leaderboard", {
             leaderboard
@@ -90,10 +108,12 @@ export class Quiz {
     }
 
     next() {
+        console.log("onwards to next problem");
+        
         this.activeProblem++;
-        const io = IoManager.getIo();
         const problem = this.problems[this.activeProblem];
-
+        console.log("new problem", problem);
+        
         
         if(problem) {
             this.setActiveProblem(problem);
@@ -107,6 +127,8 @@ export class Quiz {
 
     addUser(name: string) {
         const id = this.generateId();
+        console.log("id", id);
+        
         this.users.push({
             name,
             id,
@@ -141,7 +163,7 @@ export class Quiz {
     }
 
     getLeaderboard() {
-        return this.users.sort((a, b) => a.points < b.points ? 1 : -1).splice(0, 20);
+        return this.users.sort((a, b) => a.points < b.points ? 1 : -1).slice(0, 20);
     }
 
     getCurrentState() {

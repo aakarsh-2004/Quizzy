@@ -46,7 +46,7 @@ export class QuizManager {
             id: (globalProblemId++).toString(),
             startTime: new Date().getTime(),
             submissions: []
-        })
+        });;
     }
 
     public next(roomId: string) {
@@ -62,6 +62,8 @@ export class QuizManager {
         
         if(quiz) {
             return quiz.addUser(name);
+        } else {
+            console.log("no quiz with that roomId");
         }
     }
 
@@ -87,6 +89,9 @@ export class QuizManager {
     }
 
     addQuiz(roomId: string) {
+        if(this.getQuiz(roomId)) {
+            return;
+        }
         const quiz = new Quiz(roomId);
         this.quizzes.push(quiz);
     }

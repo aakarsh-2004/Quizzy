@@ -3,16 +3,8 @@ import { QuizManager } from "./QuizManager";
 import { AllowedOptions } from "../Quiz";
 
 export class UserManager {
-    private users: {
-        roomId: string,
-        socket: Socket;
-    }[];
     private static instance: UserManager;
     private quizManager: QuizManager = QuizManager.getQuizManager();
-
-    constructor() {
-        this.users = [];
-    }
 
     public static getInstance() {
         if(!this.instance) {
@@ -21,20 +13,26 @@ export class UserManager {
         return this.instance;
     }
 
-    addUser(roomId: string, socket: Socket) {
-        this.users.push({
-            socket, roomId
-        })
-        this.createHandlers(roomId, socket);
+    addUser(socket: Socket) {
+        this.createHandlers(socket);
     }
 
-    private createHandlers(roomId: string, socket: Socket) {
-        socket.on("join", (data) => {
+    private createHandlers(socket: Socket) {
+        socket.on("joinUser", (data) => {
             const userId = this.quizManager.addUser(data.roomId, data.name);
-            socket.emit("init", {
-                userId,
-                state: this.quizManager.getCurrentState(roomId)
-            });
+            
+            if(userId) {
+                console.log("user joined successfully");
+                console.log(data.name, data.roomId);
+                console.log('useriD', userId);            
+                
+                socket.emit("init", {
+                    userId,
+                    state: this.quizManager.getCurrentState(data.roomId)
+                });
+            } else {
+                console.error("user could not be joined");
+            }
         });
 
         socket.on("submit", (data) => {
@@ -47,7 +45,7 @@ export class UserManager {
                 return;
             }
 
-            this.quizManager.submit(roomId, problemId, submission, userId);
+            this.quizManager.submit(data.roomId, problemId, submission, userId);
         })
     }
 } 
